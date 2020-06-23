@@ -36,6 +36,49 @@ def index():
                                scores=scores)
     else:
         return render_template('index.html')
+    
+
+    
+# api for do search and send back result
+
+@app.route('/imagesearch', methods=['POST'])
+def directSearch():
+    # decode file path from byt to raw
+    file = request.data.decode()
+    # get file name
+    filename = os.path.basename(file)
+    # open file 
+    img = Image.open(file)
+    # do search
+    query = fe.extract(img)
+    dists = np.linalg.norm(features - query, axis=1)
+    ids = np.argsort(dists)[:10] 
+    scores = [(img_paths[id], str(dists[id])) for id in ids]
+    # result
+    data = dict(scores)
+    return data
+
+
+
+
+# send file path in url like: http://x.x.x.x/imgsearch/c:/cat.jpg
+@app.route('/imgsearch/<path:path>', methods=['GET', 'POST'])
+def search(path):
+    # convert file path str to raw
+    file = r"{}".format(path)
+    # get file name only
+    filename = os.path.basename(file)
+    # open file
+    img = Image.open(file)
+    # do search 
+    query = fe.extract(img)
+    dists = np.linalg.norm(features - query, axis=1)
+    ids = np.argsort(dists)[:10] # number of result
+    scores = [(img_paths[id], str(dists[id])) for id in ids]
+    # result
+    data = dict(scores)
+    return data
+
 
 if __name__=="__main__": 
     app.run("0.0.0.0")
