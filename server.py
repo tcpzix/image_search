@@ -41,23 +41,25 @@ def index():
     
 # api for do search and send back result
 
+
 @app.route('/imagesearch', methods=['POST'])
 def directSearch():
-    # decode file path from byt to raw
-    file = request.data.decode()
+    req = request.get_json()
+    file_path = req["image_address"]
     # get file name
-    filename = os.path.basename(file)
-    # open file 
+    dirname = os.path.dirname(__file__)
+    file = os.path.join(dirname, file_path)
+    filename = os.path.basename(file_path)
+    # open file
     img = Image.open(file)
     # do search
     query = fe.extract(img)
     dists = np.linalg.norm(features - query, axis=1)
-    ids = np.argsort(dists)[:10] 
+    ids = np.argsort(dists)[:10]
     scores = [(img_paths[id], str(dists[id])) for id in ids]
     # result
     data = dict(scores)
     return data
-
 
 
 
