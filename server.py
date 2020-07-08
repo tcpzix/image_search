@@ -46,6 +46,7 @@ def index():
 def directSearch():
     req = request.get_json()
     file_path = req["image_address"]
+    result_count = req["result_count"]
     # get file name
     dirname = os.path.dirname(__file__)
     file = os.path.join(dirname, file_path)
@@ -55,7 +56,7 @@ def directSearch():
     # do search
     query = fe.extract(img)
     dists = np.linalg.norm(features - query, axis=1)
-    ids = np.argsort(dists)[:10]
+    ids = np.argsort(dists)[:result_count]
     scores = [(img_paths[id], str(dists[id])) for id in ids]
     # result
     data = dict(scores)
