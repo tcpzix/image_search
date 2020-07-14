@@ -16,7 +16,8 @@ features = []
 img_paths = []
 for feature_path in glob.glob("static/feature/*"):
     features.append(pickle.load(open(feature_path, 'rb')))
-    img_paths.append('static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
+    img_paths.append('static/img/' + \
+        os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
 
 
 
@@ -26,7 +27,8 @@ def index():
         file = request.files['query_img']
 
         img = Image.open(file.stream)
-        uploaded_img_path = "static/uploaded/" + datetime.now().strftime('%Y_%m_%d_%H_%M_%S')  + "_" + file.filename
+        uploaded_img_path = "static/uploaded/" + \
+            datetime.now().strftime('%Y_%m_%d_%H_%M_%S')  + "_" + file.filename
         img.save(uploaded_img_path)
        
         query = fe.extract(img)
@@ -65,5 +67,4 @@ def search():
 
 
 if __name__=="__main__": 
-    app.run("0.0.0.0")
- 
+    app.run()
