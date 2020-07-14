@@ -1,13 +1,15 @@
 import os
 import numpy as np
-from PIL import Image
-from feature_extractor import FeatureExtractor
 import glob
 import pickle
 from datetime import datetime
+from PIL import Image
+from feature_extractor import FeatureExtractor
 from flask import Flask, request, render_template
 
+
 app = Flask(__name__) 
+
 
 fe = FeatureExtractor()
 features = []
@@ -15,6 +17,7 @@ img_paths = []
 for feature_path in glob.glob("static/feature/*"):
     features.append(pickle.load(open(feature_path, 'rb')))
     img_paths.append('static/img/' + os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -36,14 +39,12 @@ def index():
                                scores=scores)
     else:
         return render_template('index.html')
-    
 
-    
-# api for do search and send back result
 
 
 @app.route('/imagesearch', methods=['POST'])
-def directSearch():
+def search():
+    """API endpoint for searching and sending back most similar images"""
     req = request.get_json()
     file_path = req["image_address"]
     result_count = req["result_count"]
@@ -57,26 +58,6 @@ def directSearch():
     query = fe.extract(img)
     dists = np.linalg.norm(features - query, axis=1)
     ids = np.argsort(dists)[:result_count]
-    scores = [(img_paths[id], str(dists[id])) for id in ids]
-    # result
-    data = dict(scores)
-    return data
-
-
-
-# send file path in url like: http://x.x.x.x/imgsearch/c:/cat.jpg
-@app.route('/imgsearch/<path:path>', methods=['GET', 'POST'])
-def search(path):
-    # convert file path str to raw
-    file = r"{}".format(path)
-    # get file name only
-    filename = os.path.basename(file)
-    # open file
-    img = Image.open(file)
-    # do search 
-    query = fe.extract(img)
-    dists = np.linalg.norm(features - query, axis=1)
-    ids = np.argsort(dists)[:10] # number of result
     scores = [(img_paths[id], str(dists[id])) for id in ids]
     # result
     data = dict(scores)
