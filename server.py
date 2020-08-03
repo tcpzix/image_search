@@ -56,7 +56,14 @@ def search():
     image_address = json_data.get("image_address", None)
     limit = json_data.get("limit", None)
 
-    if image_address and limit:
+    try:
+        # convert limit to integer
+        limit = int(limit)
+    except ValueError:
+        # set default value
+        limit = 30
+
+    if image_address:
         # get file name
         dirname = os.path.dirname(__file__)
         file = os.path.join(dirname, image_address)
