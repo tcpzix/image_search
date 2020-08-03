@@ -24,8 +24,7 @@ img_paths = []
 for feature_path in glob.glob("static/feature/*"):
     features.append(pickle.load(open(feature_path, 'rb')))
     img_paths.append(PATH + \
-        os.path.splitext(os.path.basename(feature_path))[0] + '.jpg')
-
+        os.path.splitext(os.path.basename(feature_path))[0])
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -48,7 +47,6 @@ def index():
                                scores=scores)
     else:
         return render_template('index.html')
-
 
 
 @app.route('/imagesearch/', methods=['POST'])
