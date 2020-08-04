@@ -61,11 +61,12 @@ def search():
         limit = int(limit)
     except ValueError:
         # set default value
-        limit = 30
+        limit = 100
 
     if image_address:
         # get file name
         dirname = os.path.dirname(__file__)
+
         file = os.path.join(dirname, image_address)
         
         # open file
@@ -85,7 +86,6 @@ def search():
             })
 
         # result
-        # data = dict(scores)
         return jsonify(result)
 
     # error, fields not set
