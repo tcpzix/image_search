@@ -7,6 +7,7 @@ from PIL import Image
 from feature_extractor import FeatureExtractor
 from flask import Flask, request, render_template, jsonify
 from dotenv import load_dotenv
+from train_models import train_image
 
 
 # load .env variables
@@ -91,6 +92,23 @@ def search():
     # error, fields not set
     return {
         'detail': 'image_address and limit fields are required'
+    }, 400
+
+
+@app.route('/train/', methods=['POST'])
+def train():
+    json_data = request.get_json()
+    image_address = json_data.get("image_address", None)
+
+    if image_address:
+        if os.path.exists(image_address):
+            train_image(image_address)
+            return {'detail': 'image is trained successfully'}, 200
+        else:
+            return {'detail': 'image not found'}, 404
+
+    return {
+        'detail': 'image_address field is required'
     }, 400
 
 
